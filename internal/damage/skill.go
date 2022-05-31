@@ -2,7 +2,8 @@ package damage
 
 import (
 	"github.com/alibaba/ioc-golang/autowire/normal"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/constant"
+
+	"github.com/laurencelizhixin/genshin-dps/internal/constant"
 )
 
 // +ioc:autowire=true

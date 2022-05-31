@@ -2,7 +2,8 @@ package damage
 
 import (
 	"fmt"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/constant"
+
+	"github.com/laurencelizhixin/genshin-dps/internal/constant"
 )
 
 const StrongDescRate = 1.6 / float32(12)
@@ -70,7 +71,7 @@ func GetElementReactionResult(damageElement constant.ElementType, isDamageElemen
 	beConsumedAmount := damageElementAmount * beConsumedRate
 
 	// 计算元素反应结果
-	leftElementAmount := adhesionElementNowAmount
+	leftElementAmount := adhesionElementNowAmount - beConsumedAmount
 	leftElement := adhesionElement
 	isLeftElementStrong := isAdhesionElementStrong
 	if beConsumedAmount > adhesionElementNowAmount {
@@ -79,9 +80,6 @@ func GetElementReactionResult(damageElement constant.ElementType, isDamageElemen
 		leftElement = damageElement
 		//reactionAmountOfDamage = adhesionElementNowAmount / beConsumedAmount
 		isLeftElementStrong = isDamageElementStrong
-	} else {
-		// adhesion element still exist
-		leftElementAmount = adhesionElementNowAmount - beConsumedAmount
 	}
 	return &ElementReactionResult{
 		DamageRate:                getBasicDamageRate(damageElement, adhesionElement, em),
@@ -139,6 +137,7 @@ func getZengFuReactionEMAdditionalRate(em int) float32 {
 	return 2.78 * float32(em) / (float32(em) + 1400)
 }
 
-func getJuBianReactionAdditionalEMRate(em int) float32 {
-	return 6.67 * float32(em) / (float32(em) + 1400)
-}
+// todo support jubian reaction
+//func getJuBianReactionAdditionalEMRate(em int) float32 {
+//	return 6.67 * float32(em) / (float32(em) + 1400)
+//}

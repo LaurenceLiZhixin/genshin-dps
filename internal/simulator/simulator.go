@@ -1,10 +1,10 @@
 package simulator
 
 import (
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/appearance"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/constant"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/damage"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/simulator/pre_defined_charactor"
+	"github.com/laurencelizhixin/genshin-dps/internal/appearance"
+	"github.com/laurencelizhixin/genshin-dps/internal/constant"
+	"github.com/laurencelizhixin/genshin-dps/internal/damage"
+	"github.com/laurencelizhixin/genshin-dps/internal/simulator/pre_defined_charactor"
 )
 
 type DamageSimulator struct {
@@ -55,8 +55,9 @@ func (d *DamageSimulator) Run() {
 
 	// 5. create environment context
 	envContext := &damage.EnvContext{
-		Enemy:     enemy,
-		Resonance: []damage.DamageFilter{},
+		Enemy:                  enemy,
+		Resonance:              []damage.DamageFilter{},
+		LockDashboardDMGCtxMap: map[int]*damage.DamageContext{},
 	}
 
 	// 6. each appearance run

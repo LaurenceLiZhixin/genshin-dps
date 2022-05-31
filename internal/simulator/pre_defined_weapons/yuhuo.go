@@ -1,8 +1,8 @@
 package pre_defined_weapons
 
 import (
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/constant"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/damage"
+	"github.com/laurencelizhixin/genshin-dps/internal/constant"
+	"github.com/laurencelizhixin/genshin-dps/internal/damage"
 )
 
 func GetYuhuoFilter() damage.DamageFilter {

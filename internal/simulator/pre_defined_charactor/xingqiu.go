@@ -1,9 +1,9 @@
 package pre_defined_charactor
 
 import (
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/constant"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/damage"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/simulator/pre_defined_artifacts"
+	"github.com/laurencelizhixin/genshin-dps/internal/constant"
+	"github.com/laurencelizhixin/genshin-dps/internal/damage"
+	"github.com/laurencelizhixin/genshin-dps/internal/simulator/pre_defined_artifacts"
 )
 
 var xingqiuSingleton *damage.Character

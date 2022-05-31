@@ -2,7 +2,8 @@ package damage
 
 import (
 	"github.com/alibaba/ioc-golang/autowire/normal"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/constant"
+
+	"github.com/laurencelizhixin/genshin-dps/internal/constant"
 )
 
 // +ioc:autowire=true
@@ -47,27 +48,29 @@ func (c *Character) TouchOff(envCtx *EnvContext, action constant.Action) {
 	}
 	// 多段伤害
 	for _, r := range skill.Rates {
+		damageCtx := NewDamageCtx(&ContextParam{
+			CharacterLevel:               c.Level,
+			BaseAttack:                   c.BaseAttack,
+			ExtraAttack:                  c.ExtraAttack,
+			CRITRate:                     c.CRITRate,
+			CRITDamage:                   c.CRITDamage,
+			EMDamage:                     emDamage,
+			TalentSkillRate:              r,
+			SkillType:                    skill.Type,
+			ElementType:                  skill.Element,
+			IsStrongElement:              skill.IsStrongElement,
+			Character:                    c,
+			Skill:                        skill,
+			BackgroundSkillLockDashboard: skill.LockDashboard,
+			Enemy:                        envCtx.Enemy,
+			CreateTime:                   envCtx.AbsoluteTime,
+		})
 		// pre，当前非脱手技能释放前，先执行这段时间里需要执行的脱手技能
 		runBackgroundIfNeeded(c, envCtx)
-
-		damageCtx := NewDamageCtx(&ContextParam{
-			CharacterLevel:  c.Level,
-			BaseAttack:      c.BaseAttack,
-			ExtraAttack:     c.ExtraAttack,
-			CRITRate:        c.CRITRate,
-			CRITDamage:      c.CRITDamage,
-			EMDamage:        emDamage,
-			TalentSkillRate: r,
-			SkillType:       skill.Type,
-			ElementType:     skill.Element,
-			IsStrongElement: skill.IsStrongElement,
-			Character:       c,
-			Skill:           skill,
-			Enemy:           envCtx.Enemy,
-		})
-
 		envCtx.Damage(damageCtx)
 		for _, trailerDamageCtx := range damageCtx.TrailerDamages {
+			// pre，当前脱手非主动技能造成伤害前，先执行这段时间里需要执行的脱手技能
+			runBackgroundIfNeeded(c, envCtx)
 			envCtx.Damage(trailerDamageCtx.CopyTo())
 		}
 	}
@@ -88,8 +91,10 @@ func (c *Character) TouchOff(envCtx *EnvContext, action constant.Action) {
 			Character:                       c,
 			Skill:                           skill,
 			Enemy:                           envCtx.Enemy,
+			BackgroundSkillLockDashboard:    skill.LockDashboard,
 			BackgroundSkillLastUpdateTime:   envCtx.AbsoluteTime,
 			BackgroundSkillLastTouchOffTime: skill.AsBackgroundTouchOffTimes,
+			CreateTime:                      envCtx.AbsoluteTime,
 		})
 		envCtx.AddBackgroundDamageCtx(damageCtx)
 	}
@@ -98,7 +103,6 @@ func (c *Character) TouchOff(envCtx *EnvContext, action constant.Action) {
 func runBackgroundIfNeeded(c *Character, envCtx *EnvContext) {
 	if len(envCtx.BackgroundDamageCtxs) > 0 {
 		// todo 目前不支持多个脱手技能
-		// fixme 目前多段伤害按照一个Action，因此无法在一个技能的多段伤害之间插入脱手技能伤害/元素附着
 		updatedBackgroundDamageCtxs := make([]*DamageContext, 0)
 		for _, v := range envCtx.BackgroundDamageCtxs {
 			for v.BackgroundSkillLastUpdateTime < envCtx.AbsoluteTime && v.BackgroundSkillLastTouchOffTime > 0 {

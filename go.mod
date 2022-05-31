@@ -1,6 +1,6 @@
 module github.com/laurencelizhixin/genshin-dps
 
-go 1.18
+go 1.17
 
 require github.com/alibaba/ioc-golang v0.0.0-20220523151625-adb3befe6a44
 

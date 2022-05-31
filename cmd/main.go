@@ -2,7 +2,8 @@ package main
 
 import (
 	"github.com/alibaba/ioc-golang"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/simulator"
+
+	"github.com/laurencelizhixin/genshin-dps/internal/simulator"
 )
 
 func main() {

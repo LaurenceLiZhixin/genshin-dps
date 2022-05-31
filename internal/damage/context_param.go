@@ -1,7 +1,7 @@
 package damage
 
 import (
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/constant"
+	"github.com/laurencelizhixin/genshin-dps/internal/constant"
 )
 
 type ContextParam struct {
@@ -29,10 +29,11 @@ type ContextParam struct {
 	Skill *Skill
 
 	// Background Skill
-	BackgroundSkillLastUpdateTime      float32
-	BackgroundSkillLastTouchOffTime    int
-	BackgroundSkillLockDashboard       bool
-	BackgroundSkillLockDashboardDamage int
+	BackgroundSkillLastUpdateTime   float32
+	BackgroundSkillLastTouchOffTime int
+	BackgroundSkillLockDashboard    bool
+
+	CreateTime float32 // 伤害上下文创建时间
 }
 
 func (c *ContextParam) CopyTo() ContextParam {
@@ -56,10 +57,10 @@ func (c *ContextParam) CopyTo() ContextParam {
 
 		Skill: c.Skill,
 
-		BackgroundSkillLastUpdateTime:      c.BackgroundSkillLastUpdateTime,
-		BackgroundSkillLastTouchOffTime:    c.BackgroundSkillLastTouchOffTime,
-		BackgroundSkillLockDashboard:       c.BackgroundSkillLockDashboard,
-		BackgroundSkillLockDashboardDamage: c.BackgroundSkillLockDashboardDamage,
+		BackgroundSkillLastUpdateTime:   c.BackgroundSkillLastUpdateTime,
+		BackgroundSkillLastTouchOffTime: c.BackgroundSkillLastTouchOffTime,
+		BackgroundSkillLockDashboard:    c.BackgroundSkillLockDashboard,
+		CreateTime:                      c.CreateTime,
 	}
 }
 

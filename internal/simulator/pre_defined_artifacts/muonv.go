@@ -1,7 +1,7 @@
 package pre_defined_artifacts
 
 import (
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/damage"
+	"github.com/laurencelizhixin/genshin-dps/internal/damage"
 )
 
 func GetMuoNv2ArtifactFilter() damage.DamageFilter {

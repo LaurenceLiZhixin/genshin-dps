@@ -1,12 +1,10 @@
 package damage
 
-import "github.com/laurencelizhixin/genshin-dps-simulator/internal/constant"
+import "github.com/laurencelizhixin/genshin-dps/internal/constant"
 
 type Enemy struct {
 	// 元素抗性
 	AllElementDef *AllElementDef
-
-	xingqiuQLastTime float32
 
 	Level int
 }
@@ -30,10 +28,8 @@ func NewAllElementDef(def map[constant.ElementType]float32) *AllElementDef {
 		},
 		defFiltersMap: map[string]ElementDefFilter{},
 	}
-	if def != nil {
-		for k, v := range def {
-			defaultDef.allElements[k] = v
-		}
+	for k, v := range def {
+		defaultDef.allElements[k] = v
 	}
 	return defaultDef
 }

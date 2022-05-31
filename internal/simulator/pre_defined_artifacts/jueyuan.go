@@ -1,8 +1,8 @@
 package pre_defined_artifacts
 
 import (
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/constant"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/damage"
+	"github.com/laurencelizhixin/genshin-dps/internal/constant"
+	"github.com/laurencelizhixin/genshin-dps/internal/damage"
 )
 
 func GetJueyuan2ArtifactFilter() damage.DamageFilter {

@@ -2,8 +2,10 @@ package damage
 
 import (
 	"fmt"
+
 	"github.com/alibaba/ioc-golang/autowire/normal"
-	"github.com/laurencelizhixin/genshin-dps-simulator/internal/constant"
+
+	"github.com/laurencelizhixin/genshin-dps/internal/constant"
 )
 
 // +ioc:autowire=true
@@ -163,8 +165,9 @@ func (d *DamageContext) CopyTo() *DamageContext {
 type EnvContext struct {
 	Enemy *Enemy
 
-	avgTPS   int
-	totalDmg int
+	// todo generate report
+	//avgTPS   int
+	//totalDmg int
 
 	DeployedDamageFilters []*DeployedDamageFilter
 
@@ -182,8 +185,11 @@ type EnvContext struct {
 	BackgroundDamageCtxs   []*DamageContext
 	BackgroundSkillContext *DamageContext
 
-	// 共鸣
+	// 共鸣，仅限白值之外的加成
 	Resonance []DamageFilter
+
+	// 锁面板技能伤害上下文
+	LockDashboardDMGCtxMap map[int]*DamageContext
 }
 
 func (e *EnvContext) AddBackgroundDamageCtx(ctx *DamageContext) {
@@ -240,6 +246,28 @@ func (e *EnvContext) Damage(dmgCtx *DamageContext) int {
 		f.TouchOff(dmgCtx)
 	}
 
+	// 锁面板机制
+	if dmgCtx.BackgroundSkillLockDashboard {
+		copiedDmgCtx := dmgCtx.CopyTo()
+		skillID := int(dmgCtx.TalentSkillRate * 100) // fixme 图省事，用了talentRate作为技能id了，后面可能有坑
+		oriDmgCtx, ok := e.LockDashboardDMGCtxMap[skillID]
+		if ok {
+			// 已有伤害面板
+			cachedDmgCtx := oriDmgCtx.CopyTo()
+			// 检查是否过期
+			if float32(dmgCtx.Skill.AsBackgroundTouchOffTimes)*dmgCtx.Skill.CostTime+cachedDmgCtx.CreateTime > e.AbsoluteTime {
+				// 没有过期
+				dmgCtx = cachedDmgCtx.CopyTo()
+			} else {
+				// 过期了，使用新面板，写入环境
+				e.LockDashboardDMGCtxMap[skillID] = copiedDmgCtx
+			}
+		} else {
+			// 首次释放锁面板技能，使用新面板，写入环境
+			e.LockDashboardDMGCtxMap[skillID] = copiedDmgCtx
+		}
+	}
+
 	// 4. calculate damage
 	lowDmg, elementReactinoResult := dmgCtx.LowDamage()
 	//avgDmt := dmgCtx.AvgDamage()
@@ -258,15 +286,8 @@ func (e *EnvContext) Damage(dmgCtx *DamageContext) int {
 	}
 
 	// 7. 总结伤害上下文和伤害数值
-	// 锁面板脱手技能按照第一次伤害
 	// fixme: 目前锁面板机制有问题，不能按照伤害锁，要按照filter来锁，例如锁面板后，元素增幅反应还需要正常计算
-	if dmgCtx.BackgroundSkillLockDashboard {
-		if dmgCtx.BackgroundSkillLockDashboardDamage != 0 {
-			lowDmg = dmgCtx.BackgroundSkillLockDashboardDamage
-		} else {
-			dmgCtx.BackgroundSkillLockDashboardDamage = lowDmg
-		}
-	}
+
 	// 暴击伤害
 	maxDmt := int(float32(lowDmg) * (dmgCtx.Character.CRITDamage + 1))
 	dmgCtx.AfterDamageSnapshot(lowDmg, maxDmt, elementReactinoResult)
@@ -286,5 +307,6 @@ func (p *Param) Init(e *EnvContext) (*EnvContext, error) {
 	e.Enemy = &p.Enemy
 	e.DeployedDamageFilters = make([]*DeployedDamageFilter, 0)
 	e.AbsoluteTime = 0
+	e.LockDashboardDMGCtxMap = make(map[int]*DamageContext)
 	return e, nil
 }
